@@ -82,6 +82,22 @@ RequestQueue.enqueue Job.new('Hello')
 
 In this example, the job instances are unique, so they wouldn't be automatically deduped. But, when the class of a message responds to `filter`, it will be called and give you the opportunity to provide custom dedupe logic.
 
+## Testing
+
+When testing, sometimes you want a little more control. As such, `RequestQueue` offers multiple queue backends:
+
+* `:default` - Runs jobs at the end of the request.
+* `:fake` - Never runs jobs, and allows you to inspect the queue with `RequestQueue.queue.queue`.
+* `:inline` - Runs jobs immediately and never adds them to the queue.
+
+To change the queueing backend, you can just say `RequestQueue.use`:
+
+```ruby
+RequestQueue.use :inline
+```
+
+**NOTE:** Only use the `use` method in the testing environment. It is not thread-safe.
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
