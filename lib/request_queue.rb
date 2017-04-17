@@ -45,6 +45,8 @@ module RequestQueue
       self.queue = backend.new
       yield if block_given?
       queue.process
+    ensure
+      self.queue = nil
     end
   end
 end
