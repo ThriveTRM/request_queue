@@ -3,7 +3,7 @@ require 'request_queue/queue'
 module RequestQueue
   class InlineQueue < Queue
     def <<(message)
-      message.process
+      message.call
     end
 
     def process
