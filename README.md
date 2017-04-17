@@ -26,7 +26,7 @@ Or install it yourself as:
 
 A a job can be any callable, so for example:
 
-```
+```ruby
 job = proc { puts 'Hello' }
 
 RequestQueue.enqueue(job)
