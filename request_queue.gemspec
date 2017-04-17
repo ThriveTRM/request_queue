@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ['raymondzane@gmail.com']
 
   spec.summary       = 'Dedupe tasks on a per-request basis'
-  spec.homepage      = 'https://github.com/rzane/request_queue'
+  spec.homepage      = 'https://github.com/thrivetrm/request_queue'
   spec.license       = 'MIT'
 
   spec.files         = `git ls-files -z`.split("\x0").reject do |f|
