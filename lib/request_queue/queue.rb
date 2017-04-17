@@ -11,7 +11,7 @@ module RequestQueue
     end
 
     def process!
-      filter.each(&:process)
+      filter.each(&:call)
     end
     alias process process!
 

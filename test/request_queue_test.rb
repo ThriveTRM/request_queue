@@ -8,11 +8,11 @@ class RequestQueueTest < Minitest::Test
       @hits = 0
     end
 
-    def process
+    def call
       @hits += 1
     end
 
-    def processed?
+    def called?
       @hits > 0
     end
   end
@@ -32,10 +32,10 @@ class RequestQueueTest < Minitest::Test
 
     RequestQueue.process do
       RequestQueue.enqueue(message)
-      refute message.processed?
+      refute message.called?
     end
 
-    assert message.processed?
+    assert message.called?
   end
 
   def test_dedupe
@@ -58,8 +58,8 @@ class RequestQueueTest < Minitest::Test
       RequestQueue.enqueue(m2)
     end
 
-    refute m1.processed?
-    refute m2.processed?
+    refute m1.called?
+    refute m2.called?
   end
 
   def test_use_default
@@ -101,7 +101,7 @@ class RequestQueueTest < Minitest::Test
       assert_equal 1, RequestQueue.queue.queue.length
     end
 
-    refute message.processed?
+    refute message.called?
   end
 
   def test_inline
@@ -111,7 +111,7 @@ class RequestQueueTest < Minitest::Test
 
     RequestQueue.process do
       RequestQueue.enqueue(message)
-      assert message.processed?
+      assert message.called?
     end
 
     assert_equal 1, message.hits
