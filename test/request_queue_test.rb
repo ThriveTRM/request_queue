@@ -23,15 +23,11 @@ class RequestQueueTest < Minitest::Test
     end
   end
 
-  def setup
-    RequestQueue.use :default
-  end
-
   def test_enqueue
     message = Message.new
 
-    RequestQueue.process do
-      RequestQueue.enqueue(message)
+    q.process do
+      q.enqueue(message)
       refute message.called?
     end
 
@@ -41,9 +37,9 @@ class RequestQueueTest < Minitest::Test
   def test_dedupe
     message = Message.new
 
-    RequestQueue.process do
-      RequestQueue.enqueue(message)
-      RequestQueue.enqueue(message)
+    q.process do
+      q.enqueue(message)
+      q.enqueue(message)
     end
 
     assert_equal 1, message.hits
@@ -53,67 +49,76 @@ class RequestQueueTest < Minitest::Test
     m1 = Message.new
     m2 = FilterMessage.new
 
-    RequestQueue.process do
-      RequestQueue.enqueue(m1)
-      RequestQueue.enqueue(m2)
+    q.process do
+      q.enqueue(m1)
+      q.enqueue(m2)
     end
 
     refute m1.called?
     refute m2.called?
   end
 
-  def test_use_default
-    assert_nil RequestQueue.queue
-
-    RequestQueue.process do
-      assert_kind_of RequestQueue::Queue, RequestQueue.queue
+  def test_backend_default
+    q.process :default do
+      assert_kind_of q::Queue, q.queue
     end
   end
 
-  def test_use_fake
-    RequestQueue.use :fake
-
-    assert_nil RequestQueue.queue
-
-    RequestQueue.process do
-      assert_kind_of RequestQueue::FakeQueue, RequestQueue.queue
+  def test_backend_fake
+    q.process :fake do
+      assert_kind_of RequestQueue::FakeQueue, q.queue
     end
   end
 
-
-  def test_use_inline
-    RequestQueue.use :inline
-
-    assert_nil RequestQueue.queue
-
-    RequestQueue.process do
-      assert_kind_of RequestQueue::InlineQueue, RequestQueue.queue
+  def test_backend_inline
+    q.process :inline do
+      assert_kind_of RequestQueue::InlineQueue, q.queue
     end
   end
 
-  def test_fake
-    RequestQueue.use :fake
-
+  def test_fake_queue
     message = Message.new
 
-    RequestQueue.process do
-      RequestQueue.enqueue(message)
-      assert_equal 1, RequestQueue.queue.queue.length
+    q.process :fake do
+      q.enqueue(message)
+      assert_equal 1, q.queue.queue.length
     end
 
     refute message.called?
   end
 
-  def test_inline
-    RequestQueue.use :inline
-
+  def test_inline_queue
     message = Message.new
 
-    RequestQueue.process do
-      RequestQueue.enqueue(message)
+    q.process :inline do
+      q.enqueue(message)
       assert message.called?
     end
 
     assert_equal 1, message.hits
+  end
+
+  def test_nesting
+    assert_nil q.queue
+
+    q.process do
+      assert_kind_of RequestQueue::Queue, q.queue
+
+      q.process :fake do
+        assert_kind_of RequestQueue::FakeQueue, q.queue
+
+        q.process :inline do
+          assert_kind_of RequestQueue::InlineQueue, q.queue
+        end
+      end
+    end
+
+    assert_nil q.queue
+  end
+
+  private
+
+  def q
+    RequestQueue
   end
 end

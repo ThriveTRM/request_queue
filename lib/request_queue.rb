@@ -17,14 +17,6 @@ module RequestQueue
   end
 
   class << self
-    def backend
-      @backend || BACKENDS[:default]
-    end
-
-    def use(type)
-      @backend = BACKENDS.fetch(type)
-    end
-
     def queue=(value)
       RequestStore.store[:request_queue] = value
     end
@@ -41,12 +33,21 @@ module RequestQueue
       queue << message
     end
 
-    def process
-      self.queue = backend.new
-      yield if block_given?
-      queue.process
+    def process(backend = :default)
+      restore do
+        self.queue = BACKENDS.fetch(backend).new
+        yield if block_given?
+        queue.process
+      end
+    end
+
+    private
+
+    def restore
+      original_queue = self.queue
+      yield
     ensure
-      self.queue = nil
+      self.queue = original_queue
     end
   end
 end

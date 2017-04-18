@@ -90,13 +90,13 @@ When testing, sometimes you want a little more control. As such, `RequestQueue` 
 * `:fake` - Never runs jobs, and allows you to inspect the queue with `RequestQueue.queue.queue`.
 * `:inline` - Runs jobs immediately and never adds them to the queue.
 
-To change the queueing backend, you can just say `RequestQueue.use`:
+To change the queueing backend, you can just give the backend name as an argument to process.
 
 ```ruby
-RequestQueue.use :inline
+RequestQueue.process :inline do
+  # ...
+end
 ```
-
-**NOTE:** Only use the `use` method in the testing environment. It is not thread-safe.
 
 ## Development
 
