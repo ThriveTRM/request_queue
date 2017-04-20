@@ -4,7 +4,7 @@ require 'request_queue/queue'
 require 'request_queue/inline_queue'
 require 'request_queue/fake_queue'
 require 'request_queue/middleware'
-require 'request_store/railtie' if defined?(Rails::Railtie)
+require 'request_queue/railtie' if defined? Rails::Railtie
 
 module RequestQueue
   BACKENDS = {
