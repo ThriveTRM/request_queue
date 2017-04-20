@@ -34,18 +34,11 @@ module RequestQueue
     end
 
     def process(backend = :default)
-      restore do
-        self.queue = BACKENDS.fetch(backend).new
-        yield if block_given?
-        queue.process
-      end
-    end
-
-    private
-
-    def restore
       original_queue = self.queue
-      yield
+      self.queue = BACKENDS.fetch(backend).new
+      result = yield if block_given?
+      queue.process unless queue.nil?
+      result
     ensure
       self.queue = original_queue
     end

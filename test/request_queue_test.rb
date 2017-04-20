@@ -116,6 +116,10 @@ class RequestQueueTest < Minitest::Test
     assert_nil q.queue
   end
 
+  def test_process_returns_value_from_block
+    assert_equal 1, q.process { 1 }
+  end
+
   private
 
   def q
